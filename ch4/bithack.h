@@ -32,18 +32,14 @@ T returnOneAtLowestPositionNaive( T x )
   return 0;
 }
 
-template<typename T>
+template<typename T, typename F>
 void performNumerousTestWithRandomValues()
 {
-  auto check = [](T val){
-    assert( returnOneAtLowestPositionNaive(val) ==
-            returnOneAtLowestPosition(val) ); };
-
   //First, check for remarquable values
-  check( 0 );
-  check( std::numeric_limits<T>::lowest() );
-  check( std::numeric_limits<T>::min() );
-  check( std::numeric_limits<T>::max() );
+  F::check( 0 );
+  F::check( std::numeric_limits<T>::lowest() );
+  F::check( std::numeric_limits<T>::min() );
+  F::check( std::numeric_limits<T>::max() );
 
   //Then gen random uniform distribution
   std::random_device rd;
@@ -55,30 +51,19 @@ void performNumerousTestWithRandomValues()
   // Now check for random values
   for( size_t idx = 0; idx<NB_TEST; idx++ )
   {
-    std::cout << ".";
-    check( distribution(gen) );
+    F::check( distribution(gen) );
   }
 }
 
-template<typename T>
+template<template <typename> class F, typename T>
 void performTestWithType( std::tuple<T> in )
 {
-  performNumerousTestWithRandomValues<T>();
+  performNumerousTestWithRandomValues<T,F<T>>();
 }
 
-template<typename T0, typename... Tn>
+template<template <typename> class F, typename T0, typename... Tn>
 void performTestWithType( std::tuple<T0,Tn...> in )
 {
-  performNumerousTestWithRandomValues<T0>();
-  performTestWithType( std::tuple<Tn...>() );
-}
-
-//Compile using g++ ./bithack.cpp -std=c++11 -o ./test
-int main( int argc, char* argv[] )
-{
-  // Check for many signed and unsigned types
-  performTestWithType( std::tuple<short,int,long,long long,unsigned short,
-    unsigned int,unsigned long,unsigned long long>() );
-
-  return EXIT_SUCCESS;
+  performTestWithType<F,T0>( std::tuple<T0>() );
+  performTestWithType<F,Tn...>( std::tuple<Tn...>() );
 }
