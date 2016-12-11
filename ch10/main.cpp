@@ -1,22 +1,20 @@
+//STL
+#include <iostream>
+
 //Local
 #include "BinaryTree.h"
 
-/*template<typename T>
-struct TestLowest1Bit
-{
-  static void check( T val )
-  {
-    assert( returnOneAtLowestPositionNaive(val) ==
-            returnOneAtLowestPosition(val) );
-  }
-};*/
-
-//Compile using g++ ./main.cpp -std=c++11 -o ./test
+//Compile using g++ ./main.cpp -std=c++14 -o ./test
 int main( int argc, char* argv[] )
 {
-  // Check for many signed and unsigned types
-  //performTestWithType<TestLowest1Bit>( std::tuple<short,int,long,long long,unsigned short,
-  //  unsigned int,unsigned long,unsigned long long>() );
+  BinaryTree<int64_t> bst;
+  bst.Insert( 30 );
+  bst.Insert( 10 );
+  bst.Insert( -15 );
+  bst.Insert( 30 );
+  bst.Insert( 0 );
+  bst.InOrderTraversal();
 
+  std::cout <<"Mokay"<<std::endl;
   return EXIT_SUCCESS;
 }
