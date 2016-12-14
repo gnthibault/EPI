@@ -1,5 +1,6 @@
 //stl
 #include <memory>
+#include <tuple>
 
 template<typename T>
 struct BSTNode {
@@ -42,6 +43,44 @@ struct BSTNode {
 };
 
 template<typename T>
+auto GetSmallestValue(std::unique_ptr<BSTNode<T>>& node)
+{
+  auto s = std::ref(node);
+  while(s.get()->left)
+  {
+    s=std::ref(s.get()->left);
+  }
+  return s;
+}
+
+template<typename T>
+BSTNode<T>* DeleteNode(BSTNode<T>* node, T idx)
+{
+  if (node->m_idx==idx) {
+    if (!node->left && !node->right) {
+      return nullptr;
+    } else if (!node->right) {
+      return node->left.release();
+    } else if (!node->left) {
+      return node->right.release();
+    } else {
+      //replace by smallest value on right side (it has nothing on its left)
+      std::unique_ptr<BSTNode<T>>& s =
+        GetSmallestValue(node->right);
+      node->m_idx=s->m_idx;
+      s.reset(DeleteNode(s.release(),s->m_idx));
+      return node;
+    }
+  } else if (idx < node->m_idx) {
+    node->left.reset(DeleteNode(node->left.release(),idx));
+    return node;
+  } else {
+    node->right.reset(DeleteNode(node->right.release(),idx));
+    return node;
+  }
+}
+
+template<typename T>
 class BinaryTree {
  public:
   BinaryTree()=default;
@@ -56,20 +95,8 @@ class BinaryTree {
     }
   }
 
-  bool Delete(T idx) {
-    if (m_rootNode) {
-      // rootNode may not contain given idx
-      if (m_rootNode->Delete(idx)) {
-        return true;
-      } else if(m_rootNode->m_idx==idx){ //but it can itself be the node
-        m_rootNode.reset();
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return true;
-    }
+  void Delete(T idx) {
+    m_rootNode.reset(DeleteNode(m_rootNode.release(),idx));
   }
 
   void InOrderTraversal() {
