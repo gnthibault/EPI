@@ -106,34 +106,15 @@ class BinaryTree {
   }
 
   BSTNode<T>* GetSuccessor(T idx) {
+    BSTNode<T>* cur{m_rootNode.get()};
     BSTNode<T>* best{nullptr};
-    if (m_rootNode) {
-      std::function<BSTNode<T>* (BSTNode<T>*,BSTNode<T>*,T)> SearchSucc =
-        [&](BSTNode<T>* cur, BSTNode<T>* recursiveBest, T idx) {
-        BSTNode<T>* best{recursiveBest};
-        if (cur->m_idx > idx) {
-          if (best) {
-            if (cur->m_idx < best->m_idx) {
-              best = cur;
-            }
-          } else {
-            best = cur;
-          }
-          if (cur->left) {
-            auto s = SearchSucc(cur->left.get(), best, idx);
-            if (s)
-              best = s;
-          }
-        } else {
-          if (cur->right) {
-            auto s = SearchSucc(cur->right.get(), best, idx);
-            if (s)
-              best = s;
-          }
-       }
-       return best;
-     };
-     best = SearchSucc(m_rootNode.get(), best, idx);
+    while (cur) {
+      if (cur->m_idx > idx) {
+        best = cur;
+        cur = cur->left.get();
+      } else {
+        cur = cur->right.get();
+      }
     }
     return best;
   }
