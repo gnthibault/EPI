@@ -13,10 +13,18 @@ int main( int argc, char* argv[] )
     bst.Insert( i );
   bst.InOrderTraversal();
 
-  std::cout <<"Mokay, now deleting "<<std::endl;
+  /*std::cout <<"Mokay, now deleting "<<std::endl;
   for( auto i : {30,0,10,-15,1,29})
     bst.Delete(i);
   std::cout << "Result after deletion is (should be blank): "<<std::endl;
-  bst.InOrderTraversal();
+  bst.InOrderTraversal();*/
+
+  //Get the successor of v
+  int v = 0;
+  auto n = bst.GetSuccessor(v);
+  if (n)
+    std::cout << "Successor of "<<v<<" is "<<n->m_idx<<std::endl;
+  else
+    std::cout << "There is no successor to "<<v<<std::endl;
   return EXIT_SUCCESS;
 }
