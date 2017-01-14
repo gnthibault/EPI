@@ -36,6 +36,9 @@ std::vector<T> HillisSteelInclusiveScan(const std::vector<T>& v) {
   assert(v.size()>0);
   std::vector<T> ret(v),tmp(v.size());
 
+  /* Normally, the loop should begin at n, instead of n/2,
+  * but every element between n/2 (included) and n(excluded)
+  * should also be copied to the nex estimate */
   for(size_t n = 1; n<ret.size();n*=2) {
     std::swap(ret,tmp);
     #pragma omp parallel for
@@ -70,6 +73,9 @@ std::vector<T> BlellochInclusiveScan(const std::vector<T>& v) {
     }
     Print(ret);
   }
+
+  // The downsweep part
+
   return ret;
 }
 
