@@ -13,17 +13,14 @@ The operation x -> x & ~(x-1) return a binary number that contains
 1 at the lowest position where there is a one in the original x
 */
 template<typename T>
-T returnOneAtLowestPosition( T x )
-{
+T returnOneAtLowestPosition( T x ) {
   return x & ~(x-1);
 }
 
 template<typename T>
-T returnOneAtLowestPositionNaive( T x )
-{
+T returnOneAtLowestPositionNaive( T x ) {
   size_t bitIdx = 0;
-  while( bitIdx < sizeof(T)*8 )
-  {
+  while (bitIdx < sizeof(T)*8) {
     T val = (x >> bitIdx) & 1;
     if( val == 1 )
       return (T)1 << bitIdx;
@@ -33,8 +30,7 @@ T returnOneAtLowestPositionNaive( T x )
 }
 
 template<typename T, typename F>
-void performNumerousTestWithRandomValues()
-{
+void performNumerousTestWithRandomValues() {
   //First, check for remarquable values
   F::check( 0 );
   F::check( std::numeric_limits<T>::lowest() );
@@ -49,21 +45,18 @@ void performNumerousTestWithRandomValues()
     std::numeric_limits<T>::max() );
 
   // Now check for random values
-  for( size_t idx = 0; idx<NB_TEST; idx++ )
-  {
+  for (size_t idx = 0; idx<NB_TEST; idx++) {
     F::check( distribution(gen) );
   }
 }
 
 template<template <typename> class F, typename T>
-void performTestWithType( std::tuple<T> in )
-{
+void performTestWithType(std::tuple<T> in) {
   performNumerousTestWithRandomValues<T,F<T>>();
 }
 
 template<template <typename> class F, typename T0, typename... Tn>
-void performTestWithType( std::tuple<T0,Tn...> in )
-{
+void performTestWithType(std::tuple<T0,Tn...> in) {
   performTestWithType<F,T0>( std::tuple<T0>() );
   performTestWithType<F,Tn...>( std::tuple<Tn...>() );
 }
