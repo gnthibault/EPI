@@ -55,26 +55,38 @@ std::vector<T> HillisSteelInclusiveScan(const std::vector<T>& v) {
 
 /*
 * Blelloch Parallel scan, input vector size SHOULD be a power of 2
-* It has a step complexity of O(log2(n)), but a work complexity of O(n log(n))
+* It has a step complexity of O(2 log2(n)), but a work complexity of O(n)
 * By design Blelloch scan is an exclusive scan, so we did a simple modification
 * at the end to that we return the inclusive scan version
 */
 template<template<typename U> class Op, typename T>
 std::vector<T> BlellochInclusiveScan(const std::vector<T>& v) {
   assert(v.size()>0);
+  std::vector<T> ret(v);
 
   // The reduce part
-  std::vector<T> ret(v),tmp(v.size());
-  for(size_t n = 1; n<ret.size();n*=2) {
-    std::swap(ret,tmp);
+  for(size_t n = 1; n<ret.size(); n*=2) {
     #pragma omp parallel for
-    for(size_t i=0; i<ret.size()/(2*n); i++) {
-      ret[2*i+n]=Op<T>::Op(tmp[2*i],tmp[2*i+n]);
+    for(size_t i=1; i<=ret.size()/(2*n); i++) {
+      ret[2*n*i-1]=Op<T>::Op(ret[2*n*i-1],ret[2*n*i-1-n]);
     }
-    Print(ret);
   }
 
   // The downsweep part
+  T last = ret[ret.size()-1];
+  ret[ret.size()-1]=Op<T>::identity;
+  for(size_t n = ret.size()/2; n>=1; n/=2) {
+    #pragma omp parallel for
+    for(size_t i=1; i<=ret.size()/(2*n); i++) {
+      T t = ret[2*n*i-1-n];
+      ret[2*n*i-1-n]=ret[2*n*i-1];
+      ret[2*n*i-1]=Op<T>::Op(ret[2*n*i-1],t);
+    }
+  }
+
+  //Transform the exclusive scan into its inclusive version
+  std::copy(ret.begin()+1,ret.end(),ret.begin());
+  ret[ret.size()-1]=last;
 
   return ret;
 }
@@ -90,8 +102,9 @@ public:
 
 int main(int argc, char* argv[])
 {
-  std::vector<int> v{1,-1,4,2,4,-2,-3,5};
+  std::vector<int> v{1,2,3,4,5,6,7,8};
   Print(SequentialInclusiveScan<Plus>(v));
   Print(HillisSteelInclusiveScan<Plus>(v));
+  Print(BlellochInclusiveScan<Plus>(v));
   return EXIT_SUCCESS;
 }
