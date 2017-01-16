@@ -3,35 +3,36 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include <queue>
-
-struct comparator {
-  bool operator()(int i, int j) {
-    return i > j;
-  }
-};
 
 int main(int argc, char const *argv[]) {
-  //Min Heap implementation
-  std::priority_queue<int, std::vector<int>, comparator> minHeap;
+  std::vector<int> v;
+
   //Max Heap implementation
-  std::priority_queue<int, std::vector<int>> maxHeap;
-
+  std::make_heap(v.begin(),v.end());
   for (auto val : {-1,-5,3,2}) {
-    minHeap.push(val);
-    maxHeap.push(val);
+    v.push_back(val);
+    std::push_heap(v.begin(),v.end());
   }
-
-  std::cout << "Min Heap gives: ";
-  while (!minHeap.empty()) {
-    std::cout << minHeap.top() << ", ";
-    minHeap.pop();
+  std::cout << "Max Heap gives: ";
+  while (!v.empty()) {
+    std::pop_heap(v.begin(),v.end());
+    std::cout << v.back() << ", ";
+    v.pop_back();
   }
   std::cout << std::endl;
-  std::cout << "Max Heap gives: ";
-  while (!maxHeap.empty()) {
-    std::cout << maxHeap.top() << ", ";
-    maxHeap.pop();
+
+  //Min Heap implementation
+  auto comp = [](int lhs, int rhs) { return lhs > rhs; };
+  std::make_heap(v.begin(),v.end(),comp);
+  for (auto val : {-1,-5,3,2}) {
+    v.push_back(val);
+    std::push_heap(v.begin(),v.end(),comp);
+  }
+  std::cout << "Min Heap gives: ";
+  while (!v.empty()) {
+    std::pop_heap(v.begin(),v.end(),comp);
+    std::cout << v.back() << ", ";
+    v.pop_back();
   }
   std::cout << std::endl;
   return EXIT_SUCCESS;
