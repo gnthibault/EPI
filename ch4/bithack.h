@@ -9,7 +9,7 @@
 #define NB_TEST 4096
 
 /**
-The operation x -> x & ~(x-1) return a binary number that contains
+The operation x -> x & ~(x-1) returns a binary number that contains
 1 at the lowest position where there is a one in the original x
 */
 template<typename T>
