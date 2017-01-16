@@ -34,21 +34,6 @@ void PopLastElem(std::list<T>& src, std::list<T>& tmp) {
 
 
 template<typename T>
-void Reconstruct(std::list<T>& src, std::list<T>& dst ,std::list<T>& tmp,
-                  int nsrc, int ndst) {
-  if (nsrc=1 && ndst==1) {
-    PopLastElem(src,dst);
-  } else {
-    PopLastElem(src,tmp);
-    PopLastElem(src,dst);
-    PopLastElem(tmp,dst);
-    Reconstruct(src,dst,tmp,nsrc-2,ndst+2)
-
-  }
-}
-
-
-template<typename T>
 class HanoiTower {
 public:
   HanoiTower(size_t n) {
@@ -57,7 +42,7 @@ public:
   }
 
   void PerformHanoi() {
-    Reconstruct(pegs[0],pegs[1],pegs[2],pegs[0].size());
+    Reconstruct(pegs[0],pegs[1],pegs[2],pegs[0].size(),0);
   }
 
   void Check() {
@@ -69,23 +54,29 @@ public:
     Print(pegs[2]);
   }
 
-  /*void PerformHanoi(std::list<T>& src, std::list<T>& dst, std::list<T> tmp,
-    int n) {
-    if (n==1) {
-      PopLastElem(src,dst);
-    } else {
+  void Reconstruct(std::list<T>& src, std::list<T>& dst ,std::list<T>& tmp,
+                    int remain, int done) {
+    if (remain>0) {
+      //Pop top element from src, and put on tmp
       PopLastElem(src,tmp);
-      Reconstruct()
-      PerformHanoi(,n-1);
+      //Transfer dst on top of src
+      Reconstruct(dst,src,tmp,done,0);
+      //Pop top element from tmp, and put on dst
+      PopLastElem(tmp,dst);
+      //Transfer the previous storage from src to dst
+      Reconstruct(src,dst,tmp,done,0);
+      //Next step
+      Reconstruct(src,dst,tmp,remain-1,done+1);
+
     }
-  }*/
+  }
 
 protected:
   std::array<std::list<T>,3> pegs;
 };
 
 int main(int argc, char* argv[]) {
-  HanoiTower<int> t(5);
+  HanoiTower<int> t(10);
   t.PerformHanoi();
   t.Check();
   return EXIT_SUCCESS;
